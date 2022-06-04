@@ -14,7 +14,7 @@ class BooksAndRents
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Users::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private $user;
 
     #[ORM\Column(type: 'string', length: 255)]

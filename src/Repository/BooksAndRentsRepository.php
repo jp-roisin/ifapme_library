@@ -38,7 +38,39 @@ class BooksAndRentsRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    
 
+    public function findByISBN($ISBN){
+        $conn = $this->getEntityManager()->getConnection();
+        $sql="SELECT 
+        bar.id,
+        bar.user_id,
+        bar.isbn,
+        bar.author,
+        bar.publisher,
+        bar.title,
+        bar.sub_title,
+        bar.category,
+        bar.description,
+        bar.cover,
+        bar.language,
+        bar.relase_date,
+        bar.rent_started_at,
+        bar.rent_ended_at,
+        bar.is_rented,
+        bar.rent_price,
+        u.id as user_id ,
+        u.last_name,
+        u.first_name,
+        u.email,
+        u.is_actif,
+        u.is_deleted,
+        u.created_at,
+        u.updated_at 
+        FROM books_and_rents bar LEFT JOIN 'users' u ON bar.user_id=u.id WHERE bar.isbn LIKE '%".$ISBN."%';" ;       $books=$conn->fetchAllAssociative($sql);
+        return $books;
+            }
+        
 //    /**
 //     * @return BooksAndRents[] Returns an array of BooksAndRents objects
 //     */
