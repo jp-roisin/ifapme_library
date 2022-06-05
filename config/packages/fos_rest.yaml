@@ -1,16 +1,18 @@
 # Read the documentation: https://symfony.com/doc/master/bundles/FOSRestBundle/index.html
 fos_rest:
+  exception: true
   body_converter:
     enabled: true
     validate: true
     validation_errors_argument: violations
   view:
     view_response_listener: true
-    formats: { json: true, xml: false, rss: false}
+    formats: { json: true, xml: true, rss: false, html: true}      
+    empty_content: 204  
   format_listener:
     rules:
-      - { path: ^/api/, priorities: [ html, json, xml ], fallback_format: ~, prefer_extension: true }
-      - { path: '^/', priorities: [ 'html', '*/*'], fallback_format: html, prefer_extension: true }
+      - { path: ^/api/, priorities: [ html, json, xml ], fallback_format: json, prefer_extension: true }
+      - { path: '^/', priorities: [ 'html', json, xml, '*/*'], fallback_format: json, prefer_extension: true }
 #    param_fetcher_listener:  true
 #    allowed_methods_listener:  true
 #    routing_loader: true
