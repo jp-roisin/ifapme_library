@@ -41,7 +41,7 @@ class BooksAndRentsController extends AbstractFOSRestController
 
 
     /**
-     * @Rest\Post("/create/location", name="books_rents")
+     * @Rest\Post("/api/create/location", name="books_rents")
      * @Rest\View()
      * @ParamConverter("BooksAndRents",converter="fos_rest.request_body")
      */

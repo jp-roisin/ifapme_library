@@ -23,9 +23,8 @@ security:
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             custom_authenticator: App\Security\AuthAuthenticator
         api:
-            pattern: ~/api
+            pattern:   ^/api
             stateless: true
-            provider: default
             jwt: ~
 
             # activate different ways to authenticate
@@ -41,6 +40,7 @@ security:
         - { path: ^/api/login_check, roles: PUBLIC_ACCESS }
         - { path: ^/api/activate, roles: PUBLIC_ACCESS }
         - { path: ^/api/users/email/, roles: PUBLIC_ACCESS }
+        - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
