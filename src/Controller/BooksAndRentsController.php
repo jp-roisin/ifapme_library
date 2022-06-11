@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use DateInterval;
+use App\Entity\Users;
 use App\Entity\BooksAndRents;
+use App\Repository\UsersRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\BooksAndRentsRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -46,18 +49,16 @@ class BooksAndRentsController extends AbstractFOSRestController
      * @Rest\View()
      * @ParamConverter("BooksAndRents",converter="fos_rest.request_body")
      */
-    public function addFollow(BooksAndRents $BooksAndRents,ManagerRegistry $doctrine){
+    public function addFollow(Request $req, BooksAndRents $BooksAndRents,ManagerRegistry $doctrine, UsersRepository $repoUser){
         $em = $doctrine->getManager();
         $BooksAndRents->setRentStartedAt(new \DateTime("now"));
-        
         $dateEnd=new \DateTime("now");
         $oldDay = $dateEnd->format("d");
         $dateEnd->add(new \DateInterval("P1M"));
         $BooksAndRents->setRentEndedAt($dateEnd);
-
         $BooksAndRents->setIsRented(1);
         $em->persist($BooksAndRents);
          $em->flush();
-        return $this->view(Response::HTTP_CREATED);
+        return $this->view("| Response :".Response::HTTP_CREATED." |");
     }
 }
