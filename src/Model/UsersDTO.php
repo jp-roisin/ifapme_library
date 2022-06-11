@@ -7,13 +7,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class UsersDTO
 {
-
-    public function __construct() {
-        $this->password="test";
-        $this->lastName="test";
-        $this->firstName="test";
-        $this->email="test@test.com";
-    }
     /**
      * @var string
      * @Assert\Length(min=1, minMessage="Le nom doit avoir au moins un caractère !",max=20,maxMessage="Le nom ne peut pas dépasser 20 caractères !")
@@ -109,6 +102,8 @@ class UsersDTO
      * @Assert\NotBlank ()
      */
     private string $password;
+
+
 
     /**
      * @return Users
