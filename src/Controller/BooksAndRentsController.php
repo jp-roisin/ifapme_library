@@ -56,7 +56,12 @@ class BooksAndRentsController extends AbstractFOSRestController
         $oldDay = $dateEnd->format("d");
         $dateEnd->add(new \DateInterval("P1M"));
         $BooksAndRents->setRentEndedAt($dateEnd);
-        $BooksAndRents->setIsRented(1);
+        if($BooksAndRents->getIsRented()==0){
+             $BooksAndRents->setIsRented(1);
+            }
+        else {
+            $BooksAndRents->setIsRented(0);
+        }
         $em->persist($BooksAndRents);
          $em->flush();
         return $this->view("| Response :".Response::HTTP_CREATED." |");
