@@ -83,7 +83,7 @@ class BooksAndRentsController extends AbstractFOSRestController
         $curl = curl_init();
         $em = $doctrine->getManager();
   $booksIsIt=$repo->findByISBN($ISBN);
-  if ($booksIsIt == []) {
+  if ($booksIsIt ===[]) {
       curl_setopt_array($curl, [
             CURLOPT_URL => "https://www.googleapis.com/books/v1/volumes?q=isbn:".$ISBN,
             CURLOPT_RETURNTRANSFER => true,
