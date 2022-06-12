@@ -79,10 +79,12 @@ class BooksAndRentsController extends AbstractFOSRestController
      * @Rest\Post("/api/searchBOOKS/{ISBN}", name="search_books")
      * @Rest\View()
      */
-    public function createBooksAndRents($ISBN,ManagerRegistry $doctrine){
+    public function createBooksAndRents($ISBN,ManagerRegistry $doctrine,BooksAndRentsRepository $repo){
         $curl = curl_init();
         $em = $doctrine->getManager();
-        curl_setopt_array($curl, [
+  $booksIsIt=$repo->findByISBN($ISBN);
+  if ($booksIsIt == []) {
+      curl_setopt_array($curl, [
             CURLOPT_URL => "https://www.googleapis.com/books/v1/volumes?q=isbn:".$ISBN,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
@@ -96,46 +98,48 @@ class BooksAndRentsController extends AbstractFOSRestController
             CURLOPT_CUSTOMREQUEST => "GET"
         ]);
 
-        $response = curl_exec($curl);
-        $response = json_decode($response,true);
+      $response = curl_exec($curl);
+      $response = json_decode($response, true);
         
-        curl_close($curl);
-        $response=$response["items"];
-        // return $response;
-        foreach ($response as $bookAPI) {
-            $bookAndRents = new BooksAndRents;
-            $bookAndRents->setIsbn($bookAPI["volumeInfo"]["industryIdentifiers"][0]["identifier"]);
-            if(isset($bookAPI["volumeInfo"]["authors"][0]))
-            {
-                $bookAndRents->setAuthor($bookAPI["volumeInfo"]["authors"][0]);
-            }
+      curl_close($curl);
+      if(!isset($response["items"])){
+        return $this->view("| Response : BOOKS UNFOUND ! |");
+     };
+      $response=$response["items"];
+
+      // return $response;
+      foreach ($response as $bookAPI) {
+          $bookAndRents = new BooksAndRents;
+          $bookAndRents->setIsbn($bookAPI["volumeInfo"]["industryIdentifiers"][0]["identifier"]);
+          if (isset($bookAPI["volumeInfo"]["authors"][0])) {
+              $bookAndRents->setAuthor($bookAPI["volumeInfo"]["authors"][0]);
+          }
            
-            $bookAndRents->setTitle($bookAPI["volumeInfo"]["title"]);
+          $bookAndRents->setTitle($bookAPI["volumeInfo"]["title"]);
 
-            if(isset($bookAPI["volumeInfo"]["publisher"]))
-                {
-                    $bookAndRents->setPublisher($bookAPI["volumeInfo"]["publisher"]);
-                }
+          if (isset($bookAPI["volumeInfo"]["publisher"])) {
+              $bookAndRents->setPublisher($bookAPI["volumeInfo"]["publisher"]);
+          }
 
-                if(isset($bookAPI["volumeInfo"]["categories"]))
-                {
-                    $bookAndRents->setCategory($bookAPI["volumeInfo"]["categories"][0]);
-                }
-                if(isset($bookAPI["volumeInfo"]["description"]))
-                {
-                    $bookAndRents->setDescription($bookAPI["volumeInfo"]["description"]);
-                }
-                if(isset($bookAPI["volumeInfo"]["imageLinks"]["smallThumbnail"]))
-                {
-                    $bookAndRents->setCover($bookAPI["volumeInfo"]["imageLinks"]["smallThumbnail"]);
-                }
+          if (isset($bookAPI["volumeInfo"]["categories"])) {
+              $bookAndRents->setCategory($bookAPI["volumeInfo"]["categories"][0]);
+          }
+          if (isset($bookAPI["volumeInfo"]["description"])) {
+              $bookAndRents->setDescription($bookAPI["volumeInfo"]["description"]);
+          }
+          if (isset($bookAPI["volumeInfo"]["imageLinks"]["smallThumbnail"])) {
+              $bookAndRents->setCover($bookAPI["volumeInfo"]["imageLinks"]["smallThumbnail"]);
+          }
          
-            $bookAndRents->setLanguage($bookAPI["volumeInfo"]["language"]);
-            $em->persist($bookAndRents);
-          
-        }
-        $em->flush();
-
-        return $this->view("| Response :".Response::HTTP_CREATED." |");
+          $bookAndRents->setLanguage($bookAPI["volumeInfo"]["language"]);
+          $em->persist($bookAndRents);
+      }
+      $em->flush();
+      return $this->view("| Response :".Response::HTTP_CREATED." |");
+  }
+  else if($booksIsIt != [] ){
+    return $this->view("| Response : BOOKS ALREADY IN STOCK ! |");
+  }
+       
     }
 }
